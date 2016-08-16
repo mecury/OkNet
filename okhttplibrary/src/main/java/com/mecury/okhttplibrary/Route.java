@@ -1,7 +1,6 @@
 package com.mecury.okhttplibrary;
 
-import android.location.Address;
-import android.net.Proxy;
+import java.net.Proxy;
 
 import java.net.InetSocketAddress;
 
@@ -25,7 +24,7 @@ import java.net.InetSocketAddress;
 public final class Route {
     final Address address;
     final Proxy proxy;
-    final InetSocketAddress inetsocketAddress;
+    final InetSocketAddress inetSocketAddress;
 
     public Route(Address address, Proxy proxy, InetSocketAddress inetsocketAddress) {
         if (address == null) {
@@ -39,7 +38,7 @@ public final class Route {
         }
         this.address = address;
         this.proxy = proxy;
-        this.inetsocketAddress = inetsocketAddress;
+        this.inetSocketAddress = inetsocketAddress;
     }
 
     public Address address(){
@@ -57,8 +56,31 @@ public final class Route {
         return proxy;
     }
 
+    /**
+     * Returns true if this route tunnels HTTPS through an HTTP proxy. See <a
+     * href="http://www.ietf.org/rfc/rfc2817.txt">RFC 2817, Section 5.2</a>.
+     * 返回true， 如果路线Https通过 HTTP代理
+     */
     public boolean requiresTunnel(){
-        return address.sslSocketFactory
+        return address.sslSocketFactory != null && proxy.type() == Proxy.Type.HTTP;
+    }
+
+    @Override public boolean equals(Object obj) {
+        if (obj instanceof Route) {
+            Route other = (Route) obj;
+            return address.equals(other.address)
+                    && proxy.equals(other.proxy)
+                    && inetSocketAddress.equals(other.inetSocketAddress);
+        }
+        return false;
+    }
+
+    @Override public int hashCode() {
+        int result = 17;
+        result = 31 * result + address.hashCode();
+        result = 31 * result + proxy.hashCode();
+        result = 31 * result + inetSocketAddress.hashCode();
+        return result;
     }
 }
 

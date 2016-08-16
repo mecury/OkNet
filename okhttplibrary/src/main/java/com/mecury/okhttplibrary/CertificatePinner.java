@@ -30,9 +30,10 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import okio.ByteString;
 
 /**
- * Constrains which certificates are trusted. Pinning certificates defends against attacks on
+ * Constrains(约束) which certificates are trusted. Pinning certificates defends against attacks on
  * certificate authorities. It also prevents connections through man-in-the-middle certificate
  * authorities either known or unknown to the application's user.
+ * 约束受信任的证书，防止证书受到证书机构的攻击。它也预防中间已知或未知的中间人证书的连接
  *
  * <p>This class currently pins a certificate's Subject Public Key Info as described on <a
  * href="http://goo.gl/AIx3e5">Adam Langley's Weblog</a>. Pins are either base64 SHA-256 hashes as
