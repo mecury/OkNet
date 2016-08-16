@@ -1,6 +1,5 @@
 package com.mecury.okhttplibrary;
 
-import com.mecury.okhttplibrary.internal.RequestBody;
 import com.mecury.okhttplibrary.internal.http.HttpMethod;
 
 import java.net.URL;

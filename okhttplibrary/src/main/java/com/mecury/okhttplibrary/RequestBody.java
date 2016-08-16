@@ -1,6 +1,6 @@
-package com.mecury.okhttplibrary.internal;
+package com.mecury.okhttplibrary;
 
-import com.mecury.okhttplibrary.MediaType;
+import com.mecury.okhttplibrary.internal.Util;
 
 import java.io.File;
 import java.io.IOException;
