@@ -100,7 +100,7 @@ public class ConnectionPool {
         assert (Thread.holdsLock(this));
         for (RealConnection connection : connections){
 
-            
+
         }
     }
 }
