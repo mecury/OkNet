@@ -24,7 +24,7 @@ public enum Protocol {
      * <p>This version of OkHttp implements <a href="http://www.ietf.org/rfc/rfc2616.txt">RFC
      * 2616</a>, and tracks revisions to that spec.
      */
-    HttP_1_1("http/1.1"),
+    HTTP_1_1("http/1.1"),
 
     /**
      * Chromium's binary-framed protocol that includes header compression, multiplexing multiple
@@ -61,7 +61,7 @@ public enum Protocol {
      */
     public static Protocol get(String protocol) throws IOException {
         if (protocol.equals(HTTP_1_0.protocol)) return HTTP_1_0;
-        if (protocol.equals(HttP_1_1.protocol)) return HttP_1_1;
+        if (protocol.equals(HTTP_1_1.protocol)) return HTTP_1_1;
         if (protocol.equals(HTTP_2.protocol)) return HTTP_2;
         if (protocol.equals(SPDY_3.protocol)) return SPDY_3;
         throw new IOException("Unexpected protocol: " + protocol);

@@ -18,10 +18,12 @@ package com.mecury.okhttplibrary.internal.http2;
 import com.mecury.okhttplibrary.Headers;
 import com.mecury.okhttplibrary.OkHttpClient;
 import com.mecury.okhttplibrary.Protocol;
+import com.mecury.okhttplibrary.Request;
 import com.mecury.okhttplibrary.Response;
 import com.mecury.okhttplibrary.internal.Internal;
 import com.mecury.okhttplibrary.internal.Util;
 import com.mecury.okhttplibrary.internal.connection.StreamAllocation;
+import com.mecury.okhttplibrary.internal.http.HttpCodec;
 import com.mecury.okhttplibrary.internal.http.HttpMethod;
 
 import java.io.IOException;
