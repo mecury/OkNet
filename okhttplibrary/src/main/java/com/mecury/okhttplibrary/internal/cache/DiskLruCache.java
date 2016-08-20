@@ -113,19 +113,30 @@ public class DiskLruCache implements Closeable, Flushable{
      * The first five lines of the journal form its header. They are the
      * constant string "libcore.io.DiskLruCache", the disk cache's version,
      * the application's version, the value count, and a blank line.
+     * 前五行组成头部。
      *
      * Each of the subsequent lines in the file is a record of the state of a
      * cache entry. Each line contains space-separated values: a state, a key,
      * and optional state-specific values.
+     * 后续的每一行是缓存实体的记录。每一行用空格分隔的值包括：状态，key， 可选的具体的状态值
+     *
      *   o DIRTY lines track that an entry is actively being created or updated.
      *     Every successful DIRTY action should be followed by a CLEAN or REMOVE
      *     action. DIRTY lines without a matching CLEAN or REMOVE indicate that
      *     temporary files may need to be deleted.
+     *     DIRTY 表明entry被创建或者更新，每一个成功的DIRTY的操作都应该跟一个CLEAN 或者 REMOVE
+     *     DIRTY没有一个匹配的CLEAN 或者REMOVE 表明文件可能需要删除
+     *
      *   o CLEAN lines track a cache entry that has been successfully published
      *     and may be read. A publish line is followed by the lengths of each of
      *     its values.
+     *     CLEAN 表明缓存entry 已经被成功的建立和读取，建立的行跟随者每一个values的长度
+     *
      *   o READ lines track accesses for LRU.
+     *   READ 表明
+     *
      *   o REMOVE lines track entries that have been deleted.
+     *    REMOVE entry被删除
      *
      * The journal file is appended to as cache operations occur. The journal may
      * occasionally be compacted by dropping redundant lines. A temporary file named

@@ -14,6 +14,8 @@ public interface InternalCache {
 
     Response get(Request request) throws IOException;
 
+    CacheRequest put(Response response) throws IOException;
+
     /**
      * Remove any cache entries for the supplied {@code request}. This is invoked when the client
      * invalidates the cache, such as when making POST requests.
