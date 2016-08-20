@@ -6,4 +6,5 @@ package com.mecury.okhttplibrary;
 final class RealCall implements Call {
     private OkHttpClient client;
     private RetryAndFollowUpIntercepter mRetryAndFollowUpIntercepter;
+
 }

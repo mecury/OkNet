@@ -1,5 +1,7 @@
 package com.mecury.okhttplibrary;
 
+import com.mecury.okhttplibrary.internal.http.HttpHeaders;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,7 +72,7 @@ public final class CacheControl {
      *
      * <p>In a request, it means do not use a cache to satisfy(满足) the request.
      */
-    public boolean nocache(){
+    public boolean noCache(){
         return noCache;
     }
 
@@ -182,7 +184,7 @@ public final class CacheControl {
                     if (pos < value.length() && value.charAt(pos) == '\"'){
                         pos++;  // consume '"' open quote
                         int parameterStart = pos;
-                        pos = HttpHeaders.skipUntil(value, pos, '\"');
+                        pos = HttpHeaders.skipUntil(value, pos, String.valueOf('\"'));
                         parameter = value.substring(parameterStart, pos);
                         pos++;  // consume '"' close quote (if necessary)
 

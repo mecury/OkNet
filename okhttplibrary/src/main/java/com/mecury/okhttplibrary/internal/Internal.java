@@ -18,10 +18,19 @@ package com.mecury.okhttplibrary.internal;
 import android.location.Address;
 
 import com.mecury.okhttplibrary.ConnectionPool;
+import com.mecury.okhttplibrary.ConnectionSpec;
 import com.mecury.okhttplibrary.Headers;
+import com.mecury.okhttplibrary.HttpUrl;
 import com.mecury.okhttplibrary.OkHttpClient;
+import com.mecury.okhttplibrary.internal.cache.InternalCache;
 import com.mecury.okhttplibrary.internal.connection.RealConnection;
+import com.mecury.okhttplibrary.internal.connection.RouteDatabase;
 import com.mecury.okhttplibrary.internal.connection.StreamAllocation;
+
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+
+import javax.net.ssl.SSLSocket;
 
 /**
  * Escalate(升级) internal APIs in {@code okhttp3} so they can be used from OkHttp's implementation
@@ -40,7 +49,24 @@ public abstract class Internal {
 
   public abstract void addLenient(Headers.Builder builder, String name, String value);
 
-  public abstract void setCache(OkHttpClient.Builder builder, String name, String value);
+  public abstract void setCache(OkHttpClient.Builder builder, InternalCache internalCache);
 
-  public abstract RealConnection get(ConnectionPool pool, Address address, StreamAllocation streamAllocation);
+  public abstract RealConnection get(
+          ConnectionPool pool, Address address, StreamAllocation streamAllocation);
+
+  public abstract void put(ConnectionPool pool, RealConnection connection);
+
+  public abstract boolean connectionBecameIdle(ConnectionPool pool, RealConnection connection);
+
+  public abstract RouteDatabase routeDatabase(ConnectionPool connectionPool);
+
+  public abstract void apply(ConnectionSpec tlsConfiguration, SSLSocket sslSocket,
+                             boolean isFallback);
+
+  public abstract HttpUrl getHttpUrlChecked(String url)
+          throws MalformedURLException, UnknownHostException;
+
+  public abstract StreamAllocation callEngineGetStreamAllocation(Call call);
+
+  public abstract void setCallWebSocket(Call call);
 }
