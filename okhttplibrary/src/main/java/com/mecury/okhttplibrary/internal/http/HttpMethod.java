@@ -29,11 +29,11 @@ public class HttpMethod {
                 || method.equals("LOCK");     // (WebDAV) body: create lock, without body: refresh lock
     }
 
-    public static boolean redirectWithBody(String method){
+    public static boolean redirectsWithBody(String method){
         return method.equals("PROPFIND");   //(WebDAV) redirects should also maintain the request body
     }
 
-    public static boolean rediectsToGet(String method){
+    public static boolean redirectsToGet(String method){
         return !method.equals("PROPFIND");
     }
 

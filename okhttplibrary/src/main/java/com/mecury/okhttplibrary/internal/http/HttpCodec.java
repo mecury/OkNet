@@ -2,6 +2,7 @@ package com.mecury.okhttplibrary.internal.http;
 
 import com.mecury.okhttplibrary.Request;
 import com.mecury.okhttplibrary.Response;
+import com.mecury.okhttplibrary.ResponseBody;
 
 import java.io.IOException;
 

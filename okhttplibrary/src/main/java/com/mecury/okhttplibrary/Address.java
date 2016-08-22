@@ -1,11 +1,9 @@
 package com.mecury.okhttplibrary;
 
-import android.net.Proxy;
-
 import com.mecury.okhttplibrary.internal.Dns;
 import com.mecury.okhttplibrary.internal.Util;
 
-import java.net.Authenticator;
+import java.net.Proxy;
 import java.net.ProxySelector;
 import java.util.List;
 
@@ -96,7 +94,7 @@ public class Address {
      * Returns the socket factory for new connections.
      * 为新的connection 返回socket factory
      */
-    public SocketFactory sockFactory() {
+    public SocketFactory socketFactory() {
         return socketFactory;
     }
 

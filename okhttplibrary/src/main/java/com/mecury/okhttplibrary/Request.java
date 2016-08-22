@@ -162,7 +162,7 @@ public final class Request {
             return this;
         }
 
-        public Builder removeHeaders(String name){
+        public Builder removeHeader(String name){
             headers.removeAll(name);
             return this;
         }
@@ -180,7 +180,7 @@ public final class Request {
          */
         public Builder cacheControl(CacheControl cacheControl){
             String value = cacheControl.toString();
-            if (value.isEmpty()) return removeHeaders("Cache-Control");
+            if (value.isEmpty()) return removeHeader("Cache-Control");
             return  header("Cache-Control", value);
         }
 

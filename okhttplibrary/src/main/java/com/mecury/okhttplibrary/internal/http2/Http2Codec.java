@@ -20,6 +20,7 @@ import com.mecury.okhttplibrary.OkHttpClient;
 import com.mecury.okhttplibrary.Protocol;
 import com.mecury.okhttplibrary.Request;
 import com.mecury.okhttplibrary.Response;
+import com.mecury.okhttplibrary.ResponseBody;
 import com.mecury.okhttplibrary.internal.Internal;
 import com.mecury.okhttplibrary.internal.Util;
 import com.mecury.okhttplibrary.internal.connection.StreamAllocation;

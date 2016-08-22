@@ -56,6 +56,10 @@ public final class Route {
         return proxy;
     }
 
+    public InetSocketAddress socketAddress() {
+        return inetSocketAddress;
+    }
+
     /**
      * Returns true if this route tunnels HTTPS through an HTTP proxy. See <a
      * href="http://www.ietf.org/rfc/rfc2817.txt">RFC 2817, Section 5.2</a>.
