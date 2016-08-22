@@ -30,15 +30,16 @@ import static com.mecury.okhttplibrary.internal.Util.intersect;
  * Specifies configuration for the socket connection that HTTP traffic travels through. For {@code
  * https:} URLs, this includes the TLS version and cipher suites to use when negotiating a secure
  * connection.
+ * 设置socket连接的属性。对于HTTPS来说，它包括运输层版本和协商connection的密码协议
  *
  * <p>The TLS versions configured in a connection spec are only be used if they are also enabled in
  * the SSL socket. For example, if an SSL socket does not have TLS 1.2 enabled, it will not be used
  * even if it is present on the connection spec. The same policy also applies to cipher suites.
+ * 传输层协议在协议规范中，仅仅当他们在安全套接层中使用。
  *
  * <p>Use {@link Builder#allEnabledTlsVersions()} and {@link Builder#allEnabledCipherSuites} to
  * defer all feature selection to the underlying SSL socket.
  */
-//// TODO: 2016/8/15 OkHttpClient
 public final class ConnectionSpec {
 
   // This is nearly equal to the cipher suites supported in Chrome 51, current as of 2016-05-25.

@@ -67,8 +67,8 @@ public final class RealConnection extends Http2Connection.Listener implements Co
     public BufferedSink sink;
     public int allocationLimit;
     public final List<Reference<StreamAllocation>> allocations = new ArrayList<>();
-    public boolean noNewStream;
-    public long idleNanos = Long.MAX_VALUE;
+    public boolean noNewStreams;
+    public long idleAtNanos = Long.MAX_VALUE;
 
     public RealConnection(Route route) {
         this.route = route;

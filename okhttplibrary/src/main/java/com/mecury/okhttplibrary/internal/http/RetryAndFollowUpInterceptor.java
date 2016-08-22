@@ -26,6 +26,9 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocketFactory;
 
+import static com.mecury.okhttplibrary.internal.Util.closeQuietly;
+import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_PERM_REDIRECT;
+import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_TEMP_REDIRECT;
 import static java.net.HttpURLConnection.HTTP_CLIENT_TIMEOUT;
 import static java.net.HttpURLConnection.HTTP_MOVED_PERM;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
@@ -33,9 +36,6 @@ import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_PROXY_AUTH;
 import static java.net.HttpURLConnection.HTTP_SEE_OTHER;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
-import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_PERM_REDIRECT;
-import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_TEMP_REDIRECT;
-import static com.mecury.okhttplibrary.internal.Util.closeQuietly;
 
 /**
  * This interceptor recovers from failures and follows redirects as necessary. It may throw an

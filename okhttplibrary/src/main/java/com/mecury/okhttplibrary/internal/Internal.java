@@ -15,8 +15,9 @@
  */
 package com.mecury.okhttplibrary.internal;
 
-import android.location.Address;
 
+import com.mecury.okhttplibrary.Address;
+import com.mecury.okhttplibrary.Call;
 import com.mecury.okhttplibrary.ConnectionPool;
 import com.mecury.okhttplibrary.ConnectionSpec;
 import com.mecury.okhttplibrary.Headers;

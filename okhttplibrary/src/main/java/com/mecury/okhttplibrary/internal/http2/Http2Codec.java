@@ -26,6 +26,9 @@ import com.mecury.okhttplibrary.internal.Util;
 import com.mecury.okhttplibrary.internal.connection.StreamAllocation;
 import com.mecury.okhttplibrary.internal.http.HttpCodec;
 import com.mecury.okhttplibrary.internal.http.HttpMethod;
+import com.mecury.okhttplibrary.internal.http.RealResponseBody;
+import com.mecury.okhttplibrary.internal.http.RequestLine;
+import com.mecury.okhttplibrary.internal.http.StatusLine;
 
 import java.io.IOException;
 import java.net.ProtocolException;

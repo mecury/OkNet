@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mecury.okhttplibrary.internal.connection;
+package com.mecury.okhttplibrary.internal.http;
 
 import com.mecury.okhttplibrary.Interceptor;
 import com.mecury.okhttplibrary.Request;
 import com.mecury.okhttplibrary.Response;
-import com.mecury.okhttplibrary.internal.http.HttpCodec;
-import com.mecury.okhttplibrary.internal.http.HttpMethod;
-import com.mecury.okhttplibrary.internal.http.RealInterceptorChain;
+import com.mecury.okhttplibrary.internal.connection.StreamAllocation;
 
 import java.io.IOException;
 import java.net.ProtocolException;

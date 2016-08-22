@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 /**
  * This class coordinates the relationship between three entities:
  * 这个类依赖三个实体间的关系：

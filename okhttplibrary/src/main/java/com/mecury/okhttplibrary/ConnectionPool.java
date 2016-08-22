@@ -4,13 +4,21 @@ import com.mecury.okhttplibrary.internal.Util;
 import com.mecury.okhttplibrary.internal.connection.RealConnection;
 import com.mecury.okhttplibrary.internal.connection.RouteDatabase;
 import com.mecury.okhttplibrary.internal.connection.StreamAllocation;
+import com.mecury.okhttplibrary.internal.platform.Platform;
 
+import java.lang.ref.Reference;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import static com.mecury.okhttplibrary.internal.Util.closeQuietly;
+import static com.mecury.okhttplibrary.internal.platform.Platform.WARN;
 
 /**
  * Manages reuse of HTTP and HTTP/2 connections for reduced network latency(网络延迟). HTTP requests that
@@ -39,11 +47,23 @@ public class ConnectionPool {
     private final Runnable cleanupRunnable = new Runnable() {
         @Override
         public void run() {
-
+            while (true) {
+                long waitNanos = cleanup(System.nanoTime());
+                if (waitNanos == -1) return;
+                if (waitNanos > 0) {
+                    long waitMillis = waitNanos / 1000000L;
+                    waitNanos -= (waitMillis * 1000000L);
+                    synchronized (ConnectionPool.this) {
+                        try {
+                            ConnectionPool.this.wait(waitMillis, (int) waitNanos);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                }
+            }
         }
     };
 
-    // TODO: 2016/8/16 RealConnection未完成
     private final Deque<RealConnection> connections = new ArrayDeque<>();
     final RouteDatabase routeDatabase = new RouteDatabase();    //记录失败的Route
     boolean cleanupRunning;
@@ -98,10 +118,152 @@ public class ConnectionPool {
      */
     RealConnection get(Address address, StreamAllocation streamAllocation){
         assert (Thread.holdsLock(this));
-        for (RealConnection connection : connections){
-
-
+        for (RealConnection connection : connections) {
+            if (connection.allocations.size() < connection.allocationLimit
+                    && address.equals(connection.route().address)
+                    && !connection.noNewStreams) {
+                streamAllocation.acquire(connection);
+                return connection;
+            }
         }
+        return null;
+    }
+
+    void put(RealConnection connection) {
+        assert (Thread.holdsLock(this));
+        if (!cleanupRunning) {
+            cleanupRunning = true;
+            executor.execute(cleanupRunnable);
+        }
+        connections.add(connection);
+    }
+
+    /**
+     * Notify this pool that {@code connection} has become idle. Returns true if the connection has
+     * been removed from the pool and should be closed.
+     * 通知pool这个connection空闲了。返回true如果连接已经被pool移除 ，他也应该被关闭
+     */
+    boolean connectionBecameIdle(RealConnection connection) {
+        assert (Thread.holdsLock(this));
+        if (connection.noNewStreams || maxIdleConnections == 0) {
+            connections.remove(connection);
+            return true;
+        } else {
+            notifyAll(); // Awake the cleanup thread: we may have exceeded the idle connection limit.
+            return false;
+        }
+    }
+
+    /** Close and remove all idle connections in the pool. */
+    public void evictAll() {
+        List<RealConnection> evictedConnections = new ArrayList<>();
+        synchronized (this) {
+            for (Iterator<RealConnection> i = connections.iterator(); i.hasNext(); ) {
+                RealConnection connection = i.next();
+                if (connection.allocations.isEmpty()) {
+                    connection.noNewStreams = true;
+                    evictedConnections.add(connection);
+                    i.remove();
+                }
+            }
+        }
+
+        for (RealConnection connection : evictedConnections) {
+            closeQuietly(connection.socket());
+        }
+    }
+
+    /**
+     * Performs maintenance on this pool, evicting the connection that has been idle the longest if
+     * either it has exceeded the keep alive limit or the idle connections limit.
+     * 维护该连接池。清除空闲时间最长的连接，如果他超过了保活时间 或 空闲连接设置
+     *
+     * <p>Returns the duration in nanos to sleep until the next scheduled call to this method. Returns
+     * -1 if no further cleanups are required.
+     */
+    long cleanup(long now) {
+        int inUseConnectionCount = 0;
+        int idleConnectionCount = 0;
+        RealConnection longestIdleConnection = null;
+        long longestIdleDurationNs = Long.MIN_VALUE;
+
+        // Find either a connection to evict, or the time that the next eviction is due.
+        synchronized (this) {
+            for (Iterator<RealConnection> i = connections.iterator(); i.hasNext(); ) {
+                RealConnection connection = i.next();
+
+                // If the connection is in use, keep searching.
+                if (pruneAndGetAllocationCount(connection, now) > 0) {
+                    inUseConnectionCount++;
+                    continue;
+                }
+
+                idleConnectionCount++;
+
+                // If the connection is ready to be evicted, we're done.
+                long idleDurationNs = now - connection.idleAtNanos;
+                if (idleDurationNs > longestIdleDurationNs) {
+                    longestIdleDurationNs = idleDurationNs;
+                    longestIdleConnection = connection;
+                }
+            }
+
+            if (longestIdleDurationNs >= this.keepAliveDurationNs
+                    || idleConnectionCount > this.maxIdleConnections) {
+                // We've found a connection to evict. Remove it from the list, then close it below (outside
+                // of the synchronized block).
+                connections.remove(longestIdleConnection);
+            } else if (idleConnectionCount > 0) {
+                // A connection will be ready to evict soon.
+                return keepAliveDurationNs - longestIdleDurationNs;
+            } else if (inUseConnectionCount > 0) {
+                // All connections are in use. It'll be at least the keep alive duration 'til we run again.
+                return keepAliveDurationNs;
+            } else {
+                // No connections, idle or in use.
+                cleanupRunning = false;
+                return -1;
+            }
+        }
+
+        closeQuietly(longestIdleConnection.socket());
+
+        // Cleanup again immediately.
+        return 0;
+    }
+
+    /**
+     * Prunes any leaked allocations and then returns the number of remaining live allocations on
+     * {@code connection}. Allocations are leaked if the connection is tracking them but the
+     * application code has abandoned them. Leak detection is imprecise and relies on garbage
+     * collection.
+     * 清除泄漏的连接，然后返回剩下的能够分配的connection数量。分配泄漏发生在应用已经抛弃了该分配，
+     * 但是连接还在监视他。泄漏检测是不精确的且依赖垃圾回收
+     */
+    private int pruneAndGetAllocationCount(RealConnection connection, long now) {
+        List<Reference<StreamAllocation>> references = connection.allocations;
+        for (int i = 0; i < references.size(); ) {
+            Reference<StreamAllocation> reference = references.get(i);
+
+            if (reference.get() != null) {
+                i++;
+                continue;
+            }
+
+            // We've discovered a leaked allocation. This is an application bug.
+            Platform.get().log(WARN, "A connection to " + connection.route().address().url()
+                    + " was leaked. Did you forget to close a response body?", null);
+            references.remove(i);
+            connection.noNewStreams = true;
+
+            // If this was the last allocation, the connection is eligible for immediate eviction.
+            if (references.isEmpty()) {
+                connection.idleAtNanos = now - keepAliveDurationNs;
+                return 0;
+            }
+        }
+
+        return references.size();
     }
 }
 

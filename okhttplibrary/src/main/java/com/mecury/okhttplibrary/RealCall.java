@@ -2,9 +2,10 @@ package com.mecury.okhttplibrary;
 
 import com.mecury.okhttplibrary.internal.NamedRunnable;
 import com.mecury.okhttplibrary.internal.cache.CacheInterceptor;
-import com.mecury.okhttplibrary.internal.connection.CallServerInterceptor;
+import com.mecury.okhttplibrary.internal.connection.ConnectInterceptor;
 import com.mecury.okhttplibrary.internal.connection.StreamAllocation;
 import com.mecury.okhttplibrary.internal.http.BridgeInterceptor;
+import com.mecury.okhttplibrary.internal.http.CallServerInterceptor;
 import com.mecury.okhttplibrary.internal.http.RealInterceptorChain;
 import com.mecury.okhttplibrary.internal.http.RetryAndFollowUpInterceptor;
 import com.mecury.okhttplibrary.internal.platform.Platform;
@@ -12,6 +13,8 @@ import com.mecury.okhttplibrary.internal.platform.Platform;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mecury.okhttplibrary.internal.platform.Platform.INFO;
 
 /**
  * Created by 海飞 on 2016/8/16.
