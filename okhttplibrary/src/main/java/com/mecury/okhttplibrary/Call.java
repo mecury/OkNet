@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public interface Call extends Cloneable {
     /** Returns the original request that initiated this call. */
-    Request requset();
+    Request request();
 
     /**
      * Invokes the request immediately, and blocks until the response can be processed(处理) or is in
