@@ -72,12 +72,12 @@ public final class CacheInterceptor implements Interceptor {
 
   @Override public Response intercept(Chain chain) throws IOException {
     Response cacheCandidate = cache != null
-        ? cache.get(chain.request())
+        ? cache.get(chain.request()) //通过request得到缓存
         : null;
 
     long now = System.currentTimeMillis();
 
-    CacheStrategy strategy = new CacheStrategy.Factory(now, chain.request(), cacheCandidate).get();
+    CacheStrategy strategy = new CacheStrategy.Factory(now, chain.request(), cacheCandidate).get(); //根据request来得到缓存策略
     Request networkRequest = strategy.networkRequest;
     Response cacheResponse = strategy.cacheResponse;
 
@@ -85,12 +85,12 @@ public final class CacheInterceptor implements Interceptor {
       cache.trackResponse(strategy);
     }
 
-    if (cacheCandidate != null && cacheResponse == null) {
-      closeQuietly(cacheCandidate.body()); // The cache candidate wasn't applicable. Close it.
+    if (cacheCandidate != null && cacheResponse == null) { //存在缓存的response，但是不允许缓存
+      closeQuietly(cacheCandidate.body()); // The cache candidate wasn't applicable. Close it. 缓存不适合，关闭
     }
 
     // If we're forbidden from using the network and the cache is insufficient, fail.
-      //如果我们禁止使用网络，且缓存是不充分的，失败
+      //如果我们禁止使用网络，且缓存为null，失败
     if (networkRequest == null && cacheResponse == null) {
       return new Response.Builder()
           .request(chain.request())
@@ -104,7 +104,7 @@ public final class CacheInterceptor implements Interceptor {
     }
 
     // If we don't need the network, we're done.
-    if (networkRequest == null) {
+    if (networkRequest == null) {  //没有网络请求，跳过网络，返回缓存
       return cacheResponse.newBuilder()
           .cacheResponse(stripBody(cacheResponse))
           .build();
@@ -112,7 +112,7 @@ public final class CacheInterceptor implements Interceptor {
 
     Response networkResponse = null;
     try {
-      networkResponse = chain.proceed(networkRequest);
+      networkResponse = chain.proceed(networkRequest);//网络请求拦截器
     } finally {
       // If we're crashing on I/O or otherwise, don't leak the cache body.
         //如果我们因为I/O或其他原因崩溃，不要泄漏缓存体
@@ -124,7 +124,7 @@ public final class CacheInterceptor implements Interceptor {
     // If we have a cache response too, then we're doing a conditional get.
       //如果我们有一个缓存的response，然后我们正在做一个条件GET
     if (cacheResponse != null) {
-      if (validate(cacheResponse, networkResponse)) {
+      if (validate(cacheResponse, networkResponse)) { //比较确定缓存response可用
         Response response = cacheResponse.newBuilder()
             .headers(combine(cacheResponse.headers(), networkResponse.headers()))
             .cacheResponse(stripBody(cacheResponse))

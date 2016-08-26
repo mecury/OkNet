@@ -62,6 +62,7 @@ final class RealCall implements Call {
         this.retryAndFollowUpInterceptor.setForWebSocket(true);
     }
 
+    //异步任务使用
     @Override public void enqueue(Callback responseCallback) {
         synchronized (this) {
             if (executed) throw new IllegalStateException("Already Executed");
@@ -150,7 +151,7 @@ final class RealCall implements Call {
         return originalRequest.url().redact().toString();
     }
 
-    //拦截器的责任链。***************这里重要***************
+    //拦截器的责任链。
     private Response getResponseWithInterceptorChain() throws IOException {
         // Build a full stack of interceptors.
         List<Interceptor> interceptors = new ArrayList<>();

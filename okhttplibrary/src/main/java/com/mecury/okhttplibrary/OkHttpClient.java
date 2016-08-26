@@ -178,15 +178,15 @@ public class OkHttpClient implements Cloneable, Call.Factory {
     final InternalCache internalCache;  //内部缓存
     final SocketFactory socketFactory;  //socket 工厂
     final SSLSocketFactory sslSocketFactory; //安全套接层socket 工厂
-    final CertificateChainCleaner certificateChainCleaner; // 置验证用于确认响应证书 适用 HTTPS 请求连接的主机名。
+    final CertificateChainCleaner certificateChainCleaner; // 验证确认响应证书 适用 HTTPS 请求连接的主机名。
     final HostnameVerifier hostnameVerifier;    //  主机名字确认
     final CertificatePinner certificatePinner;  //  证书链
     final Authenticator proxyAuthenticator;     //代理身份验证
     final Authenticator authenticator;      // 本地身份验证
     final ConnectionPool connectionPool;    //连接池,复用连接
     final Dns dns;  //域名
-    final boolean followSslRedirects;  //重定向
-    final boolean followRedirects;
+    final boolean followSslRedirects;  //安全套接层重定向
+    final boolean followRedirects;  //本地重定向
     final boolean retryOnConnectionFailure; //重试连接失败
     final int connectTimeout;    //连接超时
     final int readTimeout; //read 超时
@@ -376,44 +376,45 @@ public class OkHttpClient implements Cloneable, Call.Factory {
         return networkInterceptors;
     }
 
-    /**
-     * Prepares the {@code request} to be executed at some point in the future.
-     * 准备将要被执行的request
-     */
-    @Override public Call newCall(Request request) {
-        return new RealCall(this, request);
-    }
+        /**
+        * Prepares the {@code request} to be executed at some point in the future.
+        * 准备将要被执行的request
+        */
+        @Override
+        public Call newCall(Request request) {
+            return new RealCall(this, request);
+        }
 
-    public Builder newBuilder() {
-        return new Builder(this);
-    }
+        public Builder newBuilder() {
+            return new Builder(this);
+        }
 
-    public static final class Builder {
-        Dispatcher dispatcher;
-        Proxy proxy;
-        List<Protocol> protocols;
-        List<ConnectionSpec> connectionSpecs;
-        final List<Interceptor> interceptors = new ArrayList<>();
-        final List<Interceptor> networkInterceptors = new ArrayList<>();
-        ProxySelector proxySelector;
-        CookieJar cookieJar;
-        Cache cache;
-        InternalCache internalCache;
-        SocketFactory socketFactory;
-        SSLSocketFactory sslSocketFactory;
-        CertificateChainCleaner certificateChainCleaner;
-        HostnameVerifier hostnameVerifier;
-        CertificatePinner certificatePinner;
-        Authenticator proxyAuthenticator;
-        Authenticator authenticator;
-        ConnectionPool connectionPool;
-        Dns dns;
-        boolean followSslRedirects;
-        boolean followRedirects;
-        boolean retryOnConnectionFailure;
-        int connectTimeout;
-        int readTimeout;
-        int writeTimeout;
+        public static final class Builder {
+            Dispatcher dispatcher;
+            Proxy proxy;
+            List<Protocol> protocols;
+            List<ConnectionSpec> connectionSpecs;
+            final List<Interceptor> interceptors = new ArrayList<>();
+            final List<Interceptor> networkInterceptors = new ArrayList<>();
+            ProxySelector proxySelector;
+            CookieJar cookieJar;
+            Cache cache;
+            InternalCache internalCache;
+            SocketFactory socketFactory;
+            SSLSocketFactory sslSocketFactory;
+            CertificateChainCleaner certificateChainCleaner;
+            HostnameVerifier hostnameVerifier;
+            CertificatePinner certificatePinner;
+            Authenticator proxyAuthenticator;
+            Authenticator authenticator;
+            ConnectionPool connectionPool;
+            Dns dns;
+            boolean followSslRedirects;
+            boolean followRedirects;
+            boolean retryOnConnectionFailure;
+            int connectTimeout;
+            int readTimeout;
+            int writeTimeout;
 
         public Builder() {
             dispatcher = new Dispatcher();

@@ -118,13 +118,13 @@ public final class RetryAndFollowUpInterceptor implements Interceptor{
                 continue;
             } catch (IOException e) {
                 // An attempt to communicate with a server failed. The request may have been sent.
-                // 一个与服务器通信失败，请求不会再发送
+                // 与服务器尝试通信失败，请求不会再发送
                 if (!recover(e, false, request)) throw e;
                 releaseConnection = false;
                 continue;
             } finally {
                 // We're throwing an unchecked exception. Release any resources.
-                //抛出未检查的以藏，释放资源
+                //抛出未检查的异常，释放资源
                 if (releaseConnection) {
                     streamAllocation.streamFailed(null);
                     streamAllocation.release();
@@ -133,6 +133,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor{
 
             // Attach the prior response if it exists. Such responses never have a body.
             // 附加上先前存在的response。这样的response从来没有body
+            // TODO: 2016/8/23 这里没赋值，岂不是一直为空？
             if (priorResponse != null) {
                 response = response.newBuilder()
                         .priorResponse(priorResponse.newBuilder()
@@ -141,7 +142,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor{
                         .build();
             }
 
-            Request followUp = followUpRequest(response);
+            Request followUp = followUpRequest(response); //判断状态码
 
             if (followUp == null) {
                 if (!forWebSocket) {
@@ -209,7 +210,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor{
         // This exception is fatal.异常是致命的
         if (!isRecoverable(e, routeException)) return false;
 
-        // No more routes to attempt. 没有更过的路由线路去尝试
+        // No more routes to attempt. 没有更多的路由线路去尝试
         if (!streamAllocation.hasMoreRoutes()) return false;
 
         // For failure recovery, use the same route selector with a new connection.
@@ -257,7 +258,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor{
      * Figures out the HTTP request to make in response to receiving {@code userResponse}. This will
      * either add authentication headers, follow redirects or handle a client request timeout. If a
      * follow-up is either unnecessary or not applicable, this returns null.
-     * 找出HTTP request 接收 userResponse 做出的相应，这将正价两种认证头，跟着重定向 或者 处理client请求超时
+     * 找出HTTP request 接收 user Response 做出的相应，这将正价两种认证头，跟着重定向 或者 处理client请求超时
      * 如果后续是不必要的或不适用，返回null
      */
     private Request followUpRequest(Response userResponse) throws IOException {

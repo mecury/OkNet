@@ -73,7 +73,7 @@ public final class RealInterceptorChain implements Interceptor.Chain {
       Connection connection) throws IOException {
     if (index >= interceptors.size()) throw new AssertionError();
 
-    calls++;
+    calls++; //call执行的次数
 
     // If we already have a stream, confirm that the incoming request will use it.
     //如果我们已经有一个stream。确定即将到来的request会使用它

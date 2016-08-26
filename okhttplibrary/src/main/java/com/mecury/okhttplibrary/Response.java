@@ -1,5 +1,7 @@
 package com.mecury.okhttplibrary;
 
+import com.mecury.okhttplibrary.internal.http.HttpHeaders;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
@@ -8,14 +10,14 @@ import java.util.List;
 import okio.Buffer;
 import okio.BufferedSource;
 
+import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_PERM_REDIRECT;
+import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_TEMP_REDIRECT;
 import static java.net.HttpURLConnection.HTTP_MOVED_PERM;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_PROXY_AUTH;
 import static java.net.HttpURLConnection.HTTP_SEE_OTHER;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
-import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_PERM_REDIRECT;
-import static com.mecury.okhttplibrary.internal.http.StatusLine.HTTP_TEMP_REDIRECT;
 
 /**
  * An HTTP response. Instances of this class are not immutable(不可变的): the response body is a one-shot

@@ -52,6 +52,7 @@ public final class BridgeInterceptor implements Interceptor {
     Request userRequest = chain.request();
     Request.Builder requestBuilder = userRequest.newBuilder();
 
+    //检查request。将用户的request转换为发送到server的请求
     RequestBody body = userRequest.body();
     if (body != null) {
       MediaType contentType = body.contentType();
@@ -76,9 +77,9 @@ public final class BridgeInterceptor implements Interceptor {
     if (userRequest.header("Connection") == null) {
       requestBuilder.header("Connection", "Keep-Alive");
     }
-
-    // If we add an "Accept-Encoding: gzip" header field we're responsible for also decompressing
+      // If we add an "Accept-Encoding: gzip" header field we're responsible for also decompressing
     // the transfer stream.
+    //GZIP压缩
     boolean transparentGzip = false;
     if (userRequest.header("Accept-Encoding") == null) {
       transparentGzip = true;
